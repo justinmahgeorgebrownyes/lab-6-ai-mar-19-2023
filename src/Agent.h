@@ -21,6 +21,7 @@ public:
 	[[nodiscard]] glm::vec2 GetCurrentDirection() const;
 	[[nodiscard]] float GetLOSDistance() const;
 	[[nodiscard]] bool HasLOS() const;
+
 	[[nodiscard]] float GetCurrentHeading() const;
 	[[nodiscard]] glm::vec4 GetLOSColour() const;
 
@@ -39,6 +40,7 @@ public:
 	void SetCurrentDirection(glm::vec2 new_direction);
 	void SetLOSDistance(float distance);
 	void SetHasLOS(bool state);
+	void SetHasLOS(bool state, glm::vec4 colour);
 	void SetCurrentHeading(float heading);
 	void SetLOSColour(glm::vec4 colour);
 
