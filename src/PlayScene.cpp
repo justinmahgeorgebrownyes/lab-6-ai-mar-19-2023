@@ -8,6 +8,7 @@
 #include "imgui_sdl.h"
 #include "Renderer.h"
 #include "Util.h"
+#include <fstream>
 
 PlayScene::PlayScene()
 {
@@ -69,26 +70,17 @@ void PlayScene::Start()
 
 	// Add Game Objects
 	m_pTarget = new Target();
-	m_pTarget->GetTransform()->position = glm::vec2(600.0f, 300.0f);
-	AddChild(m_pTarget);
+	m_pTarget->GetTransform()->position = glm::vec2(550.0f, 300.0f);
+	AddChild(m_pTarget, 2);
 
 	m_pStarShip = new StarShip();
 	m_pStarShip->GetTransform()->position = glm::vec2(150.0f, 300.0f);
-	AddChild(m_pStarShip);
+	AddChild(m_pStarShip, 2);
 
 	// Add Obstacles
 	BuildObstaclePool();
 
-	m_pObstacles[0]->GetTransform()->position = glm::vec2(380.0f, 80.0f);
-	m_pObstacles[0]->SetHeight(50);
-	AddChild(m_pObstacles[0]);
 
-	m_pObstacles[1]->GetTransform()->position = glm::vec2(380.0f, 280.0f);
-	m_pObstacles[1]->SetWidth(100);
-	AddChild(m_pObstacles[1]);
-
-	m_pObstacles[2]->GetTransform()->position = glm::vec2(380.0f, 480.0f);
-	AddChild(m_pObstacles[2]);
 
 	// Setup the Grid
 	m_isGridEnabled = false;
@@ -172,10 +164,20 @@ void PlayScene::GUI_Function()
 
 void PlayScene::BuildObstaclePool()
 {
-	for (int i = 0; i < 3; ++i)
+	std::ifstream inFile("../Assets/data/obstacles.txt");
+	while (!inFile.eof())
 	{
-		m_pObstacles.push_back(new Obstacle());
+		std::cout << "Obstacle " << std::endl;
+		auto obstacle = new Obstacle();
+		float x, y, w, h; // declare variables the same as how the file is organized 
+		inFile >> x >> y >> w >> h; // read data from file line by line 
+		obstacle->GetTransform()->position = glm::vec2(x, y);
+		obstacle->SetWidth(static_cast<int>(w));
+		obstacle->SetHeight(static_cast<int>(h));
+		AddChild(obstacle, 0);
+		m_pObstacles.push_back(obstacle);
 	}
+	inFile.close();
 }
 
 void PlayScene::m_buildGrid()
