@@ -22,20 +22,40 @@ void PlayScene::Draw()
 {
 	DrawDisplayList();
 
-	/*for (const auto obstacle : m_pObstacles)
-	{
-		Util::DrawRect(obstacle->GetTransform()->position - glm::vec2(obstacle->GetWidth() * 0.5f,
-			obstacle->GetHeight() * 0.5f), obstacle->GetWidth(), obstacle->GetHeight());
-	}*/
+	if (m_isGridEnabled) {
+
+		for (const auto obstacle : m_pObstacles)
+		{
+			Util::DrawRect(obstacle->GetTransform()->position - glm::vec2(obstacle->GetWidth() * 0.5f,
+				obstacle->GetHeight() * 0.5f), obstacle->GetWidth(), obstacle->GetHeight());
+		}
+
+	}
+
 
 	SDL_SetRenderDrawColor(Renderer::Instance().GetRenderer(), 255, 255, 255, 255);
 }
 
 void PlayScene::Update()
 {
+	//UpdateDisplayList();
+	//m_checkAgentLOS(m_pStarShip, m_pTarget);
+	//m_checkShipLOS(m_pTarget);
+
 	UpdateDisplayList();
 	m_checkAgentLOS(m_pStarShip, m_pTarget);
-	//m_checkShipLOS(m_pTarget);
+	switch (m_LOSMode)
+	{
+	case LOSMode::TARGET:
+		m_checkAllNodesWithTarget(m_pTarget);
+		break;
+	case LOSMode::SHIP:
+		m_checkAllNodesWithTarget(m_pStarShip);
+		break;
+	case LOSMode::BOTH:
+		m_checkAllNodesWithBoth();
+		break;
+	}
 }
 
 void PlayScene::Clean()
@@ -67,6 +87,13 @@ void PlayScene::Start()
 {
 	// Set GUI Title
 	m_guiTitle = "Play Scene";
+
+
+	// Setup a few more fields. 
+	m_LOSMode = LOSMode::TARGET;
+	m_pathNodeLOSDistance = 1000; // 1000px distance 
+	m_setPathNodeLOSDistance(m_pathNodeLOSDistance);
+
 
 	// Add Game Objects
 	m_pTarget = new Target();
@@ -112,6 +139,24 @@ void PlayScene::GUI_Function()
 	{
 		m_toggleGrid(m_isGridEnabled);
 	}
+
+	ImGui::Separator();
+
+
+	static int LOS_mode = static_cast<int>(m_LOSMode);
+	ImGui::Text("Path Node LOS");
+	ImGui::RadioButton("Target", &LOS_mode, static_cast<int>(LOSMode::TARGET)); ImGui::SameLine();
+	ImGui::RadioButton("StarShip", &LOS_mode, static_cast<int>(LOSMode::SHIP)); ImGui::SameLine();
+	ImGui::RadioButton("Both Target & StarShip", &LOS_mode, static_cast<int>(LOSMode::BOTH));
+	m_LOSMode = static_cast<LOSMode>(LOS_mode);
+
+
+
+	ImGui::Separator();
+
+	if (ImGui::SliderInt("Path Node LOS Distance", &m_pathNodeLOSDistance, 0, 1000))
+		m_setPathNodeLOSDistance(m_pathNodeLOSDistance);
+
 
 	ImGui::Separator();
 

@@ -43,7 +43,7 @@ private:
 	void m_clearNodes();
 
 	// LOS functions
-	//void m_checkShipLOS(DisplayObject* target_object) const;
+	void m_checkShipLOS(DisplayObject* target_object) const;
 
 	//bool m_checkAgentLOS(Agent* agent, DisplayObject* target_object);
 	//fucntions
